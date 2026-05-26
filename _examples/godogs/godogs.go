@@ -1,37 +1,13 @@
 package godogs
 
-import (
-	"fmt"
-)
-
 // Godogs is an example behavior holder.
 type Godogs int
 
 // Add increments Godogs count.
-func (g *Godogs) Add(n int) {
-	*g = *g + Godogs(n)
-}
+func (g *Godogs) Add(n int) { _ = "STUB: not implemented"; return }
 
 // Eat decrements Godogs count or fails if there is not enough available.
-func (g *Godogs) Eat(n int) error {
-	ng := Godogs(n)
-
-	if (g == nil && ng > 0) || ng > *g {
-		return fmt.Errorf("you cannot eat %d godogs, there are %d available", n, g.Available())
-	}
-
-	if ng > 0 {
-		*g = *g - ng
-	}
-
-	return nil
-}
+func (g *Godogs) Eat(n int) error { _ = "STUB: not implemented"; return nil }
 
 // Available returns the number of currently available Godogs.
-func (g *Godogs) Available() int {
-	if g == nil {
-		return 0
-	}
-
-	return int(*g)
-}
+func (g *Godogs) Available() int { _ = "STUB: not implemented"; return 0 }

@@ -2,6 +2,4 @@ package main
 
 import "github.com/cucumber/godog"
 
-func InitializeScenario(ctx *godog.ScenarioContext) {
-
-}
+func InitializeScenario(ctx *godog.ScenarioContext) { _ = "STUB: not implemented"; return }

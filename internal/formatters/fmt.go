@@ -1,13 +1,7 @@
 package formatters
 
 import (
-	"fmt"
-	"os"
-	"path/filepath"
 	"regexp"
-	"runtime"
-	"strconv"
-	"strings"
 
 	messages "github.com/cucumber/messages/go/v21"
 
@@ -41,64 +35,34 @@ var (
 
 type sortFeaturesByName []*models.Feature
 
-func (s sortFeaturesByName) Len() int           { return len(s) }
-func (s sortFeaturesByName) Less(i, j int) bool { return s[i].Feature.Name < s[j].Feature.Name }
-func (s sortFeaturesByName) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+func (s sortFeaturesByName) Len() int           { _ = "STUB: not implemented"; return 0 }
+func (s sortFeaturesByName) Less(i, j int) bool { _ = "STUB: not implemented"; return false }
+func (s sortFeaturesByName) Swap(i, j int)      { _ = "STUB: not implemented"; return }
 
 type sortPicklesByID []*messages.Pickle
 
-func (s sortPicklesByID) Len() int { return len(s) }
-func (s sortPicklesByID) Less(i, j int) bool {
-	iID := mustConvertStringToInt(s[i].Id)
-	jID := mustConvertStringToInt(s[j].Id)
-	return iID < jID
-}
-func (s sortPicklesByID) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+func (s sortPicklesByID) Len() int           { _ = "STUB: not implemented"; return 0 }
+func (s sortPicklesByID) Less(i, j int) bool { _ = "STUB: not implemented"; return false }
+
+func (s sortPicklesByID) Swap(i, j int) { _ = "STUB: not implemented"; return }
 
 type sortPickleStepResultsByPickleStepID []models.PickleStepResult
 
-func (s sortPickleStepResultsByPickleStepID) Len() int { return len(s) }
+func (s sortPickleStepResultsByPickleStepID) Len() int { _ = "STUB: not implemented"; return 0 }
 func (s sortPickleStepResultsByPickleStepID) Less(i, j int) bool {
-	iID := mustConvertStringToInt(s[i].PickleStepID)
-	jID := mustConvertStringToInt(s[j].PickleStepID)
-	return iID < jID
+	_ = "STUB: not implemented"
+	return false
 }
-func (s sortPickleStepResultsByPickleStepID) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
 
-func mustConvertStringToInt(s string) int {
-	i, err := strconv.Atoi(s)
-	if err != nil {
-		panic(err)
-	}
+func (s sortPickleStepResultsByPickleStepID) Swap(i, j int) { _ = "STUB: not implemented"; return }
 
-	return i
-}
+func mustConvertStringToInt(s string) int { _ = "STUB: not implemented"; return 0 }
 
 // DefinitionID ...
-func DefinitionID(sd *models.StepDefinition) string {
-	ptr := sd.HandlerValue.Pointer()
-	f := runtime.FuncForPC(ptr)
-	dir := filepath.Dir(sd.File)
-	fn := strings.Replace(f.Name(), dir, "", -1)
-	var parts []string
-	for _, gr := range matchFuncDefRef.FindAllStringSubmatch(fn, -1) {
-		parts = append(parts, strings.Trim(gr[1], "_."))
-	}
-	if len(parts) > 0 {
-		// case when suite is a structure with methods
-		fn = strings.Join(parts, ".")
-	} else {
-		// case when steps are just plain funcs
-		fn = strings.Trim(fn, "_.")
-	}
+func DefinitionID(sd *models.StepDefinition) string { _ = "STUB: not implemented"; return "" }
 
-	if pkg := os.Getenv("GODOG_TESTED_PACKAGE"); len(pkg) > 0 {
-		fn = strings.Replace(fn, pkg, "", 1)
-		fn = strings.TrimLeft(fn, ".")
-		fn = strings.Replace(fn, "..", ".", -1)
-	}
+// case when suite is a structure with methods
 
-	return fmt.Sprintf("%s:%d -> %s", filepath.Base(sd.File), sd.Line, fn)
-}
+// case when steps are just plain funcs
 
 var matchFuncDefRef = regexp.MustCompile(`\(([^\)]+)\)`)

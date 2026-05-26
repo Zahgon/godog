@@ -10,9 +10,7 @@ package colors
 import (
 	"bytes"
 	"io"
-	"strings"
 	"syscall"
-	"unsafe"
 )
 
 type csiState int
@@ -200,21 +198,13 @@ type consoleScreenBufferInfo struct {
 }
 
 func getConsoleScreenBufferInfo(hConsoleOutput uintptr) *consoleScreenBufferInfo {
-	var csbi consoleScreenBufferInfo
-	ret, _, _ := procGetConsoleScreenBufferInfo.Call(
-		hConsoleOutput,
-		uintptr(unsafe.Pointer(&csbi)))
-	if ret == 0 {
-		return nil
-	}
-	return &csbi
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func setConsoleTextAttribute(hConsoleOutput uintptr, wAttributes uint16) bool {
-	ret, _, _ := procSetConsoleTextAttribute.Call(
-		hConsoleOutput,
-		uintptr(wAttributes))
-	return ret != 0
+	_ = "STUB: not implemented"
+	return false
 }
 
 type textAttributes struct {
@@ -226,193 +216,30 @@ type textAttributes struct {
 	otherAttributes     uint16
 }
 
-func convertTextAttr(winAttr uint16) *textAttributes {
-	fgColor := winAttr & (foregroundRed | foregroundGreen | foregroundBlue)
-	bgColor := winAttr & (backgroundRed | backgroundGreen | backgroundBlue)
-	fgIntensity := winAttr & foregroundIntensity
-	bgIntensity := winAttr & backgroundIntensity
-	underline := winAttr & underscore
-	otherAttributes := winAttr &^ (foregroundMask | backgroundMask | underscore)
-	return &textAttributes{fgColor, bgColor, fgIntensity, bgIntensity, underline, otherAttributes}
-}
+func convertTextAttr(winAttr uint16) *textAttributes { _ = "STUB: not implemented"; return nil }
 
-func convertWinAttr(textAttr *textAttributes) uint16 {
-	var winAttr uint16
-	winAttr |= textAttr.foregroundColor
-	winAttr |= textAttr.backgroundColor
-	winAttr |= textAttr.foregroundIntensity
-	winAttr |= textAttr.backgroundIntensity
-	winAttr |= textAttr.underscore
-	winAttr |= textAttr.otherAttributes
-	return winAttr
-}
+func convertWinAttr(textAttr *textAttributes) uint16 { _ = "STUB: not implemented"; return 0 }
 
-func changeColor(param []byte) parseResult {
-	screenInfo := getConsoleScreenBufferInfo(uintptr(syscall.Stdout))
-	if screenInfo == nil {
-		return noConsole
-	}
+func changeColor(param []byte) parseResult { _ = "STUB: not implemented"; return *new(parseResult) }
 
-	winAttr := convertTextAttr(screenInfo.WAttributes)
-	strParam := string(param)
-	if len(strParam) <= 0 {
-		strParam = "0"
-	}
-	csiParam := strings.Split(strParam, string(separatorChar))
-	for _, p := range csiParam {
-		c, ok := colorMap[p]
-		switch {
-		case !ok:
-			switch p {
-			case ansiReset:
-				winAttr.foregroundColor = defaultAttr.foregroundColor
-				winAttr.backgroundColor = defaultAttr.backgroundColor
-				winAttr.foregroundIntensity = defaultAttr.foregroundIntensity
-				winAttr.backgroundIntensity = defaultAttr.backgroundIntensity
-				winAttr.underscore = 0
-				winAttr.otherAttributes = 0
-			case ansiIntensityOn:
-				winAttr.foregroundIntensity = foregroundIntensity
-			case ansiIntensityOff:
-				winAttr.foregroundIntensity = 0
-			case ansiUnderlineOn:
-				winAttr.underscore = underscore
-			case ansiUnderlineOff:
-				winAttr.underscore = 0
-			case ansiBlinkOn:
-				winAttr.backgroundIntensity = backgroundIntensity
-			case ansiBlinkOff:
-				winAttr.backgroundIntensity = 0
-			default:
-				// unknown code
-			}
-		case c.drawType == foreground:
-			winAttr.foregroundColor = c.code
-		case c.drawType == background:
-			winAttr.backgroundColor = c.code
-		}
-	}
-	winTextAttribute := convertWinAttr(winAttr)
-	setConsoleTextAttribute(uintptr(syscall.Stdout), winTextAttribute)
-
-	return changedColor
-}
+// unknown code
 
 func parseEscapeSequence(command byte, param []byte) parseResult {
-	if defaultAttr == nil {
-		return noConsole
-	}
-
-	switch command {
-	case sgrCode:
-		return changeColor(param)
-	default:
-		return unknown
-	}
+	_ = "STUB: not implemented"
+	return *new(parseResult)
 }
 
-func (cw *ansiColorWriter) flushBuffer() (int, error) {
-	return cw.flushTo(cw.w)
-}
+func (cw *ansiColorWriter) flushBuffer() (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
-func (cw *ansiColorWriter) resetBuffer() (int, error) {
-	return cw.flushTo(nil)
-}
+func (cw *ansiColorWriter) resetBuffer() (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 func (cw *ansiColorWriter) flushTo(w io.Writer) (int, error) {
-	var n1, n2 int
-	var err error
-
-	startBytes := cw.paramStartBuf.Bytes()
-	cw.paramStartBuf.Reset()
-	if w != nil {
-		n1, err = cw.w.Write(startBytes)
-		if err != nil {
-			return n1, err
-		}
-	} else {
-		n1 = len(startBytes)
-	}
-	paramBytes := cw.paramBuf.Bytes()
-	cw.paramBuf.Reset()
-	if w != nil {
-		n2, err = cw.w.Write(paramBytes)
-		if err != nil {
-			return n1 + n2, err
-		}
-	} else {
-		n2 = len(paramBytes)
-	}
-	return n1 + n2, nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
-func isParameterChar(b byte) bool {
-	return ('0' <= b && b <= '9') || b == separatorChar
-}
+func isParameterChar(b byte) bool { _ = "STUB: not implemented"; return false }
 
-func (cw *ansiColorWriter) Write(p []byte) (int, error) {
-	r, nw, first, last := 0, 0, 0, 0
-	if cw.mode != discardNonColorEscSeq {
-		cw.state = outsideCsiCode
-		cw.resetBuffer()
-	}
+func (cw *ansiColorWriter) Write(p []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
-	var err error
-	for i, ch := range p {
-		switch cw.state {
-		case outsideCsiCode:
-			if ch == firstCsiChar {
-				cw.paramStartBuf.WriteByte(ch)
-				cw.state = firstCsiCode
-			}
-		case firstCsiCode:
-			switch ch {
-			case firstCsiChar:
-				cw.paramStartBuf.WriteByte(ch)
-				break
-			case secondeCsiChar:
-				cw.paramStartBuf.WriteByte(ch)
-				cw.state = secondCsiCode
-				last = i - 1
-			default:
-				cw.resetBuffer()
-				cw.state = outsideCsiCode
-			}
-		case secondCsiCode:
-			if isParameterChar(ch) {
-				cw.paramBuf.WriteByte(ch)
-			} else {
-				nw, err = cw.w.Write(p[first:last])
-				r += nw
-				if err != nil {
-					return r, err
-				}
-				first = i + 1
-				result := parseEscapeSequence(ch, cw.paramBuf.Bytes())
-				if result == noConsole || (cw.mode == outputNonColorEscSeq && result == unknown) {
-					cw.paramBuf.WriteByte(ch)
-					nw, err := cw.flushBuffer()
-					if err != nil {
-						return r, err
-					}
-					r += nw
-				} else {
-					n, _ := cw.resetBuffer()
-					// Add one more to the size of the buffer for the last ch
-					r += n + 1
-				}
-
-				cw.state = outsideCsiCode
-			}
-		default:
-			cw.state = outsideCsiCode
-		}
-	}
-
-	if cw.mode != discardNonColorEscSeq || cw.state == outsideCsiCode {
-		nw, err = cw.w.Write(p[first:])
-		r += nw
-	}
-
-	return r, err
-}
+// Add one more to the size of the buffer for the last ch

@@ -1,26 +1,10 @@
 package internal
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/spf13/cobra"
-
-	"github.com/cucumber/godog"
 )
 
 // CreateVersionCmd creates the version subcommand.
-func CreateVersionCmd() cobra.Command {
-	versionCmd := cobra.Command{
-		Use:     "version",
-		Short:   "Show current version",
-		Run:     versionCmdRunFunc,
-		Version: godog.Version,
-	}
+func CreateVersionCmd() cobra.Command { _ = "STUB: not implemented"; return *new(cobra.Command) }
 
-	return versionCmd
-}
-
-func versionCmdRunFunc(cmd *cobra.Command, args []string) {
-	fmt.Fprintln(os.Stdout, "Godog version is:", godog.Version)
-}
+func versionCmdRunFunc(cmd *cobra.Command, args []string) { _ = "STUB: not implemented"; return }

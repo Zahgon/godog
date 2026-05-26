@@ -1,39 +1,23 @@
 package formatters
 
 import (
-	"bytes"
-	"fmt"
 	"io"
-	"os"
-	"sort"
-	"strconv"
-	"strings"
 	"sync"
-	"unicode"
 
 	messages "github.com/cucumber/messages/go/v21"
 
-	"github.com/cucumber/godog/colors"
 	"github.com/cucumber/godog/formatters"
-	"github.com/cucumber/godog/internal/models"
 	"github.com/cucumber/godog/internal/storage"
-	"github.com/cucumber/godog/internal/utils"
 )
 
 // BaseFormatterFunc implements the FormatterFunc for the base formatter.
 func BaseFormatterFunc(suite string, out io.Writer) formatters.Formatter {
-	return NewBase(suite, out)
+	_ = "STUB: not implemented"
+	return *new(formatters.Formatter)
 }
 
 // NewBase creates a new base formatter.
-func NewBase(suite string, out io.Writer) *Base {
-	return &Base{
-		suiteName: suite,
-		indent:    2,
-		out:       out,
-		Lock:      new(sync.Mutex),
-	}
-}
+func NewBase(suite string, out io.Writer) *Base { _ = "STUB: not implemented"; return nil }
 
 // Base is a base formatter.
 type Base struct {
@@ -46,243 +30,92 @@ type Base struct {
 }
 
 // SetStorage assigns gherkin data storage.
-func (f *Base) SetStorage(st *storage.Storage) {
-	f.Lock.Lock()
-	defer f.Lock.Unlock()
-
-	f.Storage = st
-}
+func (f *Base) SetStorage(st *storage.Storage) { _ = "STUB: not implemented"; return }
 
 // TestRunStarted is triggered on test start.
-func (f *Base) TestRunStarted() {}
+func (f *Base) TestRunStarted() {
+	_ = "STUB: not implemented"
 
-// Feature receives gherkin document.
-func (f *Base) Feature(*messages.GherkinDocument, string, []byte) {}
+	// Feature receives gherkin document.
+	return
+}
 
-// Pickle receives scenario.
-func (f *Base) Pickle(*messages.Pickle) {}
+func (f *Base) Feature(*messages.GherkinDocument, string, []byte) {
+	_ = "STUB: not implemented"
 
-// Defined receives step definition.
+	// Pickle receives scenario.
+	return
+}
+
+func (f *Base) Pickle(*messages.Pickle) {
+	_ = "STUB: not implemented"
+
+	// Defined receives step definition.
+	return
+}
+
 func (f *Base) Defined(*messages.Pickle, *messages.PickleStep, *formatters.StepDefinition) {
+	_ = "STUB: not implemented"
+
+	// Passed captures passed step.
+	return
 }
 
-// Passed captures passed step.
-func (f *Base) Passed(*messages.Pickle, *messages.PickleStep, *formatters.StepDefinition) {}
+func (f *Base) Passed(*messages.Pickle, *messages.PickleStep, *formatters.StepDefinition) {
+	_ = "STUB: not implemented"
 
-// Skipped captures skipped step.
+	// Skipped captures skipped step.
+	return
+}
+
 func (f *Base) Skipped(*messages.Pickle, *messages.PickleStep, *formatters.StepDefinition) {
+	_ = "STUB: not implemented"
+
+	// Undefined captures undefined step.
+	return
 }
 
-// Undefined captures undefined step.
 func (f *Base) Undefined(*messages.Pickle, *messages.PickleStep, *formatters.StepDefinition) {
+	_ = "STUB: not implemented"
+
+	// Failed captures failed step.
+	return
 }
 
-// Failed captures failed step.
 func (f *Base) Failed(*messages.Pickle, *messages.PickleStep, *formatters.StepDefinition, error) {
+	_ = "STUB: not implemented"
+
+	// Pending captures pending step.
+	return
 }
 
-// Pending captures pending step.
 func (f *Base) Pending(*messages.Pickle, *messages.PickleStep, *formatters.StepDefinition) {
+	_ = "STUB: not implemented"
+
+	// Ambiguous captures ambiguous step.
+	return
 }
 
-// Ambiguous captures ambiguous step.
 func (f *Base) Ambiguous(*messages.Pickle, *messages.PickleStep, *formatters.StepDefinition, error) {
+	_ = "STUB: not implemented"
+
+	// Summary renders summary information.
+	return
 }
 
-// Summary renders summary information.
-func (f *Base) Summary() {
-	var totalSc, passedSc, undefinedSc int
-	var totalSt, passedSt, failedSt, skippedSt, pendingSt, undefinedSt, ambiguousSt int
+func (f *Base) Summary() { _ = "STUB: not implemented"; return }
 
-	pickleResults := f.Storage.MustGetPickleResults()
-	for _, pr := range pickleResults {
-		var prStatus models.StepResultStatus
-		totalSc++
+// there may be some scenarios without steps
 
-		pickleStepResults := f.Storage.MustGetPickleStepResultsByPickleID(pr.PickleID)
+// go 1.5 and 1.6 prints 0 instead of 0s, if duration is zero.
 
-		if len(pickleStepResults) == 0 {
-			prStatus = undefined
-		}
+// prints used randomization seed
 
-		for _, sr := range pickleStepResults {
-			totalSt++
-
-			switch sr.Status {
-			case passed:
-				passedSt++
-			case failed:
-				prStatus = failed
-				failedSt++
-			case ambiguous:
-				prStatus = ambiguous
-				ambiguousSt++
-			case skipped:
-				skippedSt++
-			case undefined:
-				prStatus = undefined
-				undefinedSt++
-			case pending:
-				prStatus = pending
-				pendingSt++
-			}
-		}
-
-		if prStatus == passed {
-			passedSc++
-		} else if prStatus == undefined {
-			undefinedSc++
-		}
-	}
-
-	var steps, parts, scenarios []string
-	if passedSt > 0 {
-		steps = append(steps, green(fmt.Sprintf("%d passed", passedSt)))
-	}
-	if failedSt > 0 {
-		parts = append(parts, red(fmt.Sprintf("%d failed", failedSt)))
-		steps = append(steps, red(fmt.Sprintf("%d failed", failedSt)))
-	}
-	if pendingSt > 0 {
-		parts = append(parts, yellow(fmt.Sprintf("%d pending", pendingSt)))
-		steps = append(steps, yellow(fmt.Sprintf("%d pending", pendingSt)))
-	}
-	if ambiguousSt > 0 {
-		parts = append(parts, yellow(fmt.Sprintf("%d ambiguous", ambiguousSt)))
-		steps = append(steps, yellow(fmt.Sprintf("%d ambiguous", ambiguousSt)))
-	}
-	if undefinedSt > 0 {
-		parts = append(parts, yellow(fmt.Sprintf("%d undefined", undefinedSc)))
-		steps = append(steps, yellow(fmt.Sprintf("%d undefined", undefinedSt)))
-	} else if undefinedSc > 0 {
-		// there may be some scenarios without steps
-		parts = append(parts, yellow(fmt.Sprintf("%d undefined", undefinedSc)))
-	}
-	if skippedSt > 0 {
-		steps = append(steps, cyan(fmt.Sprintf("%d skipped", skippedSt)))
-	}
-	if passedSc > 0 {
-		scenarios = append(scenarios, green(fmt.Sprintf("%d passed", passedSc)))
-	}
-	scenarios = append(scenarios, parts...)
-
-	testRunStartedAt := f.Storage.MustGetTestRunStarted().StartedAt
-	elapsed := utils.TimeNowFunc().Sub(testRunStartedAt)
-
-	fmt.Fprintln(f.out, "")
-
-	if totalSc == 0 {
-		fmt.Fprintln(f.out, "No scenarios")
-	} else {
-		fmt.Fprintf(f.out, "%d scenarios (%s)\n", totalSc, strings.Join(scenarios, ", "))
-	}
-
-	if totalSt == 0 {
-		fmt.Fprintln(f.out, "No steps")
-	} else {
-		fmt.Fprintf(f.out, "%d steps (%s)\n", totalSt, strings.Join(steps, ", "))
-	}
-
-	elapsedString := elapsed.String()
-	if elapsed.Nanoseconds() == 0 {
-		// go 1.5 and 1.6 prints 0 instead of 0s, if duration is zero.
-		elapsedString = "0s"
-	}
-	fmt.Fprintln(f.out, elapsedString)
-
-	// prints used randomization seed
-	seed, err := strconv.ParseInt(os.Getenv("GODOG_SEED"), 10, 64)
-	if err == nil && seed != 0 {
-		fmt.Fprintln(f.out, "")
-		fmt.Fprintln(f.out, "Randomized with seed:", colors.Yellow(seed))
-	}
-
-	if text := f.Snippets(); text != "" {
-		fmt.Fprintln(f.out, "")
-		fmt.Fprintln(f.out, yellow("You can implement step definitions for undefined steps with these snippets:"))
-		fmt.Fprintln(f.out, yellow(text))
-	}
-}
-
-func asciiTitle(s string) string {
-	var b strings.Builder
-	b.Grow(len(s))
-
-	newWord := true
-	for i := 0; i < len(s); i++ {
-		c := s[i]
-		if ('a' <= c && c <= 'z') && newWord {
-			c -= 'a' - 'A'
-		}
-		b.WriteByte(c)
-		newWord = !('0' <= c && c <= '9' || 'A' <= c && c <= 'Z' || 'a' <= c && c <= 'z')
-	}
-	return b.String()
-}
+func asciiTitle(s string) string { _ = "STUB: not implemented"; return "" }
 
 // Snippets returns code suggestions for undefined steps.
-func (f *Base) Snippets() string {
-	undefinedStepResults := f.Storage.MustGetPickleStepResultsByStatus(undefined)
-	if len(undefinedStepResults) == 0 {
-		return ""
-	}
+func (f *Base) Snippets() string { _ = "STUB: not implemented"; return "" }
 
-	var index int
-	var snips []undefinedSnippet
-	// build snippets
-	for _, u := range undefinedStepResults {
-		pickleStep := f.Storage.MustGetPickleStep(u.PickleStepID)
+// build snippets
 
-		steps := []string{pickleStep.Text}
-		arg := pickleStep.Argument
-		if u.Def != nil {
-			steps = u.Def.Undefined
-			arg = nil
-		}
-		for _, step := range steps {
-			expr := snippetExprCleanup.ReplaceAllString(step, "\\$1")
-			expr = snippetNumbers.ReplaceAllString(expr, "(\\d+)")
-			expr = snippetExprQuoted.ReplaceAllString(expr, "$1\"([^\"]*)\"$2")
-			expr = "^" + strings.TrimSpace(expr) + "$"
-
-			name := snippetNumbers.ReplaceAllString(step, " ")
-			name = snippetExprQuoted.ReplaceAllString(name, " ")
-			name = strings.TrimSpace(snippetMethodName.ReplaceAllString(name, ""))
-			var words []string
-			for i, w := range strings.Split(name, " ") {
-				switch {
-				case i != 0:
-					w = asciiTitle(w)
-				case len(w) > 0:
-					w = string(unicode.ToLower(rune(w[0]))) + w[1:]
-				}
-				words = append(words, w)
-			}
-			name = strings.Join(words, "")
-			if len(name) == 0 {
-				index++
-				name = fmt.Sprintf("StepDefinitioninition%d", index)
-			}
-
-			var found bool
-			for _, snip := range snips {
-				if snip.Expr == expr {
-					found = true
-					break
-				}
-			}
-			if !found {
-				snips = append(snips, undefinedSnippet{Method: name, Expr: expr, argument: arg})
-			}
-		}
-	}
-
-	sort.Sort(snippetSortByMethod(snips))
-
-	var buf bytes.Buffer
-	if err := undefinedSnippetsTpl.Execute(&buf, snips); err != nil {
-		panic(err)
-	}
-	// there may be trailing spaces
-	return strings.Replace(buf.String(), " \n", "\n", -1)
-}
+// there may be trailing spaces

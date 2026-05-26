@@ -2,17 +2,11 @@ package godog
 
 import (
 	"context"
-	"fmt"
-	"reflect"
-	"regexp"
-	"runtime"
 
 	messages "github.com/cucumber/messages/go/v21"
 
 	"github.com/cucumber/godog/formatters"
-	"github.com/cucumber/godog/internal/builder"
 	"github.com/cucumber/godog/internal/flags"
-	"github.com/cucumber/godog/internal/models"
 )
 
 // GherkinDocument represents gherkin document.
@@ -77,21 +71,16 @@ type TestSuiteContext struct {
 //
 // Use it to prepare the test suite for a spin.
 // Connect and prepare database for instance...
-func (ctx *TestSuiteContext) BeforeSuite(fn func()) {
-	ctx.beforeSuiteHandlers = append(ctx.beforeSuiteHandlers, fn)
-}
+func (ctx *TestSuiteContext) BeforeSuite(fn func()) { _ = "STUB: not implemented"; return }
 
 // AfterSuite registers a function or method
 // to be run once after suite runner
-func (ctx *TestSuiteContext) AfterSuite(fn func()) {
-	ctx.afterSuiteHandlers = append(ctx.afterSuiteHandlers, fn)
-}
+func (ctx *TestSuiteContext) AfterSuite(fn func()) { _ = "STUB: not implemented"; return }
 
 // ScenarioContext allows registering scenario hooks.
 func (ctx *TestSuiteContext) ScenarioContext() *ScenarioContext {
-	return &ScenarioContext{
-		suite: ctx.suite,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ScenarioContext allows various contexts
@@ -120,32 +109,29 @@ type StepContext struct {
 // It is a good practice to restore the default state
 // before every scenario, so it would be isolated from
 // any kind of state.
-func (ctx ScenarioContext) Before(h BeforeScenarioHook) {
-	ctx.suite.beforeScenarioHandlers = append(ctx.suite.beforeScenarioHandlers, h)
-}
+func (ctx ScenarioContext) Before(h BeforeScenarioHook) { _ = "STUB: not implemented"; return }
 
 // BeforeScenarioHook defines a hook before scenario.
 type BeforeScenarioHook func(ctx context.Context, sc *Scenario) (context.Context, error)
 
 // After registers a function or method
 // to be run after every scenario.
-func (ctx ScenarioContext) After(h AfterScenarioHook) {
-	ctx.suite.afterScenarioHandlers = append(ctx.suite.afterScenarioHandlers, h)
-}
+func (ctx ScenarioContext) After(h AfterScenarioHook) { _ = "STUB: not implemented"; return }
 
 // AfterScenarioHook defines a hook after scenario.
 type AfterScenarioHook func(ctx context.Context, sc *Scenario, err error) (context.Context, error)
 
 // StepContext exposes StepContext of a scenario.
 func (ctx ScenarioContext) StepContext() StepContext {
-	return StepContext(ctx)
+	_ = "STUB: not implemented"
+	return *
+
+	// Before registers a function or method
+	// to be run before every step.
+	new(StepContext)
 }
 
-// Before registers a function or method
-// to be run before every step.
-func (ctx StepContext) Before(h BeforeStepHook) {
-	ctx.suite.beforeStepHandlers = append(ctx.suite.beforeStepHandlers, h)
-}
+func (ctx StepContext) Before(h BeforeStepHook) { _ = "STUB: not implemented"; return }
 
 // BeforeStepHook defines a hook before step.
 type BeforeStepHook func(ctx context.Context, st *Step) (context.Context, error)
@@ -159,9 +145,7 @@ type BeforeStepHook func(ctx context.Context, st *Step) (context.Context, error)
 //
 // In some cases, for example when running a headless
 // browser, to take a screenshot after failure.
-func (ctx StepContext) After(h AfterStepHook) {
-	ctx.suite.afterStepHandlers = append(ctx.suite.afterStepHandlers, h)
-}
+func (ctx StepContext) After(h AfterStepHook) { _ = "STUB: not implemented"; return }
 
 // AfterStepHook defines a hook after step.
 type AfterStepHook func(ctx context.Context, st *Step, status StepResultStatus, err error) (context.Context, error)
@@ -174,37 +158,22 @@ type AfterStepHook func(ctx context.Context, st *Step, status StepResultStatus, 
 // any kind of state.
 //
 // Deprecated: use Before.
-func (ctx ScenarioContext) BeforeScenario(fn func(sc *Scenario)) {
-	ctx.Before(func(ctx context.Context, sc *Scenario) (context.Context, error) {
-		fn(sc)
-
-		return ctx, nil
-	})
-}
+func (ctx ScenarioContext) BeforeScenario(fn func(sc *Scenario)) { _ = "STUB: not implemented"; return }
 
 // AfterScenario registers a function or method
 // to be run after every scenario.
 //
 // Deprecated: use After.
 func (ctx ScenarioContext) AfterScenario(fn func(sc *Scenario, err error)) {
-	ctx.After(func(ctx context.Context, sc *Scenario, err error) (context.Context, error) {
-		fn(sc, err)
-
-		return ctx, nil
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // BeforeStep registers a function or method
 // to be run before every step.
 //
 // Deprecated: use ScenarioContext.StepContext() and StepContext.Before.
-func (ctx ScenarioContext) BeforeStep(fn func(st *Step)) {
-	ctx.StepContext().Before(func(ctx context.Context, st *Step) (context.Context, error) {
-		fn(st)
-
-		return ctx, nil
-	})
-}
+func (ctx ScenarioContext) BeforeStep(fn func(st *Step)) { _ = "STUB: not implemented"; return }
 
 // AfterStep registers a function or method
 // to be run after every step.
@@ -218,11 +187,8 @@ func (ctx ScenarioContext) BeforeStep(fn func(st *Step)) {
 //
 // Deprecated: use ScenarioContext.StepContext() and StepContext.After.
 func (ctx ScenarioContext) AfterStep(fn func(st *Step, err error)) {
-	ctx.StepContext().After(func(ctx context.Context, st *Step, status StepResultStatus, err error) (context.Context, error) {
-		fn(st, err)
-
-		return ctx, nil
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // Step allows to register a *StepDefinition in the
@@ -253,105 +219,55 @@ func (ctx ScenarioContext) AfterStep(fn func(st *Step, err error)) {
 // If none of the *StepDefinition is matched, then
 // ErrUndefined error will be returned when
 // running steps.
-func (ctx ScenarioContext) Step(expr, stepFunc interface{}) {
-	ctx.stepWithKeyword(expr, stepFunc, formatters.None)
-}
+func (ctx ScenarioContext) Step(expr, stepFunc interface{}) { _ = "STUB: not implemented"; return }
 
 // Given functions identically to Step, but the *StepDefinition
 // will only be matched if the step starts with "Given". "And"
 // and "But" keywords copy the keyword of the last step for the
 // purpose of matching.
-func (ctx ScenarioContext) Given(expr, stepFunc interface{}) {
-	ctx.stepWithKeyword(expr, stepFunc, formatters.Given)
-}
+func (ctx ScenarioContext) Given(expr, stepFunc interface{}) { _ = "STUB: not implemented"; return }
 
 // When functions identically to Step, but the *StepDefinition
 // will only be matched if the step starts with "When". "And"
 // and "But" keywords copy the keyword of the last step for the
 // purpose of matching.
-func (ctx ScenarioContext) When(expr, stepFunc interface{}) {
-	ctx.stepWithKeyword(expr, stepFunc, formatters.When)
-}
+func (ctx ScenarioContext) When(expr, stepFunc interface{}) { _ = "STUB: not implemented"; return }
 
 // Then functions identically to Step, but the *StepDefinition
 // will only be matched if the step starts with "Then". "And"
 // and "But" keywords copy the keyword of the last step for the
 // purpose of matching.
-func (ctx ScenarioContext) Then(expr, stepFunc interface{}) {
-	ctx.stepWithKeyword(expr, stepFunc, formatters.Then)
-}
+func (ctx ScenarioContext) Then(expr, stepFunc interface{}) { _ = "STUB: not implemented"; return }
 
 func (ctx ScenarioContext) stepWithKeyword(expr interface{}, stepFunc interface{}, keyword formatters.Keyword) {
-	var regex *regexp.Regexp
+	_ = "STUB: not implemented"
+	return
 
 	// Validate the first input param is regex compatible
-	switch t := expr.(type) {
-	case *regexp.Regexp:
-		regex = t
-	case string:
-		regex = regexp.MustCompile(t)
-	case []byte:
-		regex = regexp.MustCompile(string(t))
-	default:
-		panic(fmt.Sprintf("expecting expr to be a *regexp.Regexp or a string or []byte, got type: %T", expr))
-	}
-
-	// Validate that the handler is a function.
-	handlerType := reflect.TypeOf(stepFunc)
-	if handlerType.Kind() != reflect.Func {
-		panic(fmt.Sprintf("expected handler to be func, but got: %T", stepFunc))
-	}
-
-	// FIXME = Validate the handler function param types here so
-	// that any errors are discovered early.
-	// StepDefinition.Run defines the supported types but fails at run time not registration time
-
-	// Validate the function's return types.
-	helpPrefix := "expected handler to return one of error or context.Context or godog.Steps or (context.Context, error)"
-	isNested := false
-
-	numOut := handlerType.NumOut()
-	switch numOut {
-	case 0:
-		// No return values.
-	case 1:
-		// One return value: should be error, Steps, or context.Context.
-		outType := handlerType.Out(0)
-		if outType == reflect.TypeOf(Steps{}) {
-			isNested = true
-		} else {
-			if outType != errorInterface && outType != contextInterface {
-				panic(fmt.Sprintf("%s, but got: %v", helpPrefix, outType))
-			}
-		}
-	case 2:
-		// Two return values: should be (context.Context, error).
-		if handlerType.Out(0) != contextInterface || handlerType.Out(1) != errorInterface {
-			panic(fmt.Sprintf("%s, but got: %v, %v", helpPrefix, handlerType.Out(0), handlerType.Out(1)))
-		}
-	default:
-		// More than two return values.
-		panic(fmt.Sprintf("expected handler to return either zero, one or two values, but it has: %d", numOut))
-	}
-
-	// Register the handler
-	def := &models.StepDefinition{
-		StepDefinition: formatters.StepDefinition{
-			Handler: stepFunc,
-			Expr:    regex,
-			Keyword: keyword,
-		},
-		HandlerValue: reflect.ValueOf(stepFunc),
-		Nested:       isNested,
-	}
-
-	// Get the file and line number of the call that created this step with a
-	// call to one of the Step, Given, When, or Then wrappers.
-	_, def.File, def.Line, _ = runtime.Caller(2)
-
-	// stash the step
-	ctx.suite.steps = append(ctx.suite.steps, def)
 }
+
+// Validate that the handler is a function.
+
+// FIXME = Validate the handler function param types here so
+// that any errors are discovered early.
+// StepDefinition.Run defines the supported types but fails at run time not registration time
+
+// Validate the function's return types.
+
+// No return values.
+
+// One return value: should be error, Steps, or context.Context.
+
+// Two return values: should be (context.Context, error).
+
+// More than two return values.
+
+// Register the handler
+
+// Get the file and line number of the call that created this step with a
+// call to one of the Step, Given, When, or Then wrappers.
+
+// stash the step
 
 // Build creates a test package like go test command at given target path.
 // If there are no go files in tested directory, then
@@ -365,8 +281,6 @@ func (ctx ScenarioContext) stepWithKeyword(expr interface{}, stepFunc interface{
 // of tested package.
 //
 // Returns the path to generated executable
-func Build(bin string) error {
-	return builder.Build(bin)
-}
+func Build(bin string) error { _ = "STUB: not implemented"; return nil }
 
 type Feature = flags.Feature

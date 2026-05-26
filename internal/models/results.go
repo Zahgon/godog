@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/cucumber/godog/colors"
-	"github.com/cucumber/godog/internal/utils"
 )
 
 // TestRunStarted ...
@@ -47,15 +46,8 @@ func NewStepResult(
 	attachments []PickleAttachment,
 	err error,
 ) PickleStepResult {
-	return PickleStepResult{
-		Status:       status,
-		FinishedAt:   utils.TimeNowFunc(),
-		Err:          err,
-		PickleID:     pickleID,
-		PickleStepID: pickleStepID,
-		Def:          match,
-		Attachments:  attachments,
-	}
+	_ = "STUB: not implemented"
+	return *new(PickleStepResult)
 }
 
 // StepResultStatus ...
@@ -78,34 +70,9 @@ const (
 
 // Color ...
 func (st StepResultStatus) Color() colors.ColorFunc {
-	switch st {
-	case Passed:
-		return colors.Green
-	case Failed:
-		return colors.Red
-	case Skipped:
-		return colors.Cyan
-	default:
-		return colors.Yellow
-	}
+	_ = "STUB: not implemented"
+	return *new(colors.ColorFunc)
 }
 
 // String ...
-func (st StepResultStatus) String() string {
-	switch st {
-	case Passed:
-		return "passed"
-	case Failed:
-		return "failed"
-	case Skipped:
-		return "skipped"
-	case Undefined:
-		return "undefined"
-	case Pending:
-		return "pending"
-	case Ambiguous:
-		return "ambiguous"
-	default:
-		return "unknown"
-	}
-}
+func (st StepResultStatus) String() string { _ = "STUB: not implemented"; return "" }

@@ -2,16 +2,11 @@ package formatters
 
 import (
 	"encoding/xml"
-	"fmt"
 	"io"
-	"os"
-	"sort"
-	"strconv"
 	"time"
 
 	"github.com/cucumber/godog/formatters"
 	"github.com/cucumber/godog/internal/models"
-	"github.com/cucumber/godog/internal/utils"
 )
 
 func init() {
@@ -20,7 +15,8 @@ func init() {
 
 // JUnitFormatterFunc implements the FormatterFunc for the junit formatter
 func JUnitFormatterFunc(suite string, out io.Writer) formatters.Formatter {
-	return &JUnit{Base: NewBase(suite, out)}
+	_ = "STUB: not implemented"
+	return *new(formatters.Formatter)
 }
 
 // JUnit renders test results in JUnit format.
@@ -29,177 +25,30 @@ type JUnit struct {
 }
 
 // Summary renders summary information.
-func (f *JUnit) Summary() {
-	suite := f.buildJUNITPackageSuite()
+func (f *JUnit) Summary() { _ = "STUB: not implemented"; return }
 
-	_, err := io.WriteString(f.out, xml.Header)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "failed to write junit string:", err)
-	}
-
-	enc := xml.NewEncoder(f.out)
-	enc.Indent("", s(2))
-	if err = enc.Encode(suite); err != nil {
-		fmt.Fprintln(os.Stderr, "failed to write junit xml:", err)
-	}
-}
-
-func junitTimeDuration(from, to time.Time) string {
-	return strconv.FormatFloat(to.Sub(from).Seconds(), 'f', -1, 64)
-}
+func junitTimeDuration(from, to time.Time) string { _ = "STUB: not implemented"; return "" }
 
 // getPickleResult deals with the fact that if there's no result due to 'StopOnFirstFailure' being
 // set, MustGetPickleResult panics.
 func (f *JUnit) getPickleResult(pickleID string) (res *models.PickleResult) {
-	defer func() {
-		if r := recover(); r != nil {
-			res = nil
-		}
-	}()
-	pr := f.Storage.MustGetPickleResult(pickleID)
-	res = &pr
-	return
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (f *JUnit) getPickleStepResult(stepID string) (res *models.PickleStepResult) {
-	defer func() {
-		if r := recover(); r != nil {
-			res = nil
-		}
-	}()
-	psr := f.Storage.MustGetPickleStepResult(stepID)
-	res = &psr
-	return
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (f *JUnit) getPickleStepResultsByPickleID(pickleID string) (res []models.PickleStepResult) {
-	defer func() {
-		if r := recover(); r != nil {
-			res = nil
-		}
-	}()
-	res = f.Storage.MustGetPickleStepResultsByPickleID(pickleID)
-	return
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (f *JUnit) buildJUNITPackageSuite() JunitPackageSuite {
-	features := f.Storage.MustGetFeatures()
-	sort.Sort(sortFeaturesByName(features))
-
-	testRunStartedAt := f.Storage.MustGetTestRunStarted().StartedAt
-
-	suite := JunitPackageSuite{
-		Name:       f.suiteName,
-		TestSuites: make([]*junitTestSuite, len(features)),
-		Time:       junitTimeDuration(testRunStartedAt, utils.TimeNowFunc()),
-	}
-
-	for idx, feature := range features {
-		pickles := f.Storage.MustGetPickles(feature.Uri)
-		sort.Sort(sortPicklesByID(pickles))
-
-		ts := junitTestSuite{
-			Name:      feature.Feature.Name,
-			TestCases: make([]*junitTestCase, len(pickles)),
-		}
-
-		var testcaseNames = make(map[string]int)
-		for _, pickle := range pickles {
-			testcaseNames[pickle.Name] = testcaseNames[pickle.Name] + 1
-		}
-
-		firstPickleStartedAt := testRunStartedAt
-		lastPickleFinishedAt := testRunStartedAt
-
-		var outlineNo = make(map[string]int)
-		for idx, pickle := range pickles {
-			tc := junitTestCase{}
-			tc.Name = pickle.Name
-			if testcaseNames[tc.Name] > 1 {
-				outlineNo[tc.Name] = outlineNo[tc.Name] + 1
-				tc.Name += fmt.Sprintf(" #%d", outlineNo[tc.Name])
-			}
-
-			pickleResult := f.getPickleResult(pickle.Id)
-			if pickleResult == nil {
-				tc.Status = skipped.String()
-			} else {
-				if idx == 0 {
-					firstPickleStartedAt = pickleResult.StartedAt
-				}
-				lastPickleFinishedAt = pickleResult.StartedAt
-			}
-
-			if len(pickle.Steps) > 0 {
-				lastStep := pickle.Steps[len(pickle.Steps)-1]
-				if lastPickleStepResult := f.getPickleStepResult(lastStep.Id); lastPickleStepResult != nil {
-					lastPickleFinishedAt = lastPickleStepResult.FinishedAt
-				}
-			}
-
-			if pickleResult != nil {
-				tc.Time = junitTimeDuration(pickleResult.StartedAt, lastPickleFinishedAt)
-			}
-
-			ts.Tests++
-			suite.Tests++
-
-			pickleStepResults := f.getPickleStepResultsByPickleID(pickle.Id)
-			for _, stepResult := range pickleStepResults {
-				pickleStep := f.Storage.MustGetPickleStep(stepResult.PickleStepID)
-
-				switch stepResult.Status {
-				case passed:
-					tc.Status = passed.String()
-				case failed:
-					tc.Status = failed.String()
-					tc.Failure = &junitFailure{
-						Message: fmt.Sprintf("Step %s: %s", pickleStep.Text, stepResult.Err),
-					}
-				case ambiguous:
-					tc.Status = ambiguous.String()
-					tc.Error = append(tc.Error, &junitError{
-						Type:    "ambiguous",
-						Message: fmt.Sprintf("Step %s", pickleStep.Text),
-					})
-				case skipped:
-					tc.Error = append(tc.Error, &junitError{
-						Type:    "skipped",
-						Message: fmt.Sprintf("Step %s", pickleStep.Text),
-					})
-				case undefined:
-					tc.Status = undefined.String()
-					tc.Error = append(tc.Error, &junitError{
-						Type:    "undefined",
-						Message: fmt.Sprintf("Step %s", pickleStep.Text),
-					})
-				case pending:
-					tc.Status = pending.String()
-					tc.Error = append(tc.Error, &junitError{
-						Type:    "pending",
-						Message: fmt.Sprintf("Step %s: TODO: write pending definition", pickleStep.Text),
-					})
-				}
-			}
-
-			switch tc.Status {
-			case failed.String():
-				ts.Failures++
-				suite.Failures++
-			case undefined.String(), pending.String():
-				ts.Errors++
-				suite.Errors++
-			}
-
-			ts.TestCases[idx] = &tc
-		}
-
-		ts.Time = junitTimeDuration(firstPickleStartedAt, lastPickleFinishedAt)
-
-		suite.TestSuites[idx] = &ts
-	}
-
-	return suite
+	_ = "STUB: not implemented"
+	return *new(JunitPackageSuite)
 }
 
 type junitFailure struct {

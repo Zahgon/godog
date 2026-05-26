@@ -2,9 +2,7 @@ package godog
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"strings"
 	"testing"
 )
 
@@ -12,11 +10,14 @@ import (
 // called outside the context of a test. This can be used with (for example) testify's assert and
 // require packages.
 func T(ctx context.Context) TestingT {
-	return getTestingT(ctx)
+	_ = "STUB: not implemented"
+	return *
+
+	// TestingT is a subset of the public methods implemented by go's testing.T. It allows assertion
+	// libraries to be used with godog, provided they depend only on this subset of methods.
+	new(TestingT)
 }
 
-// TestingT is a subset of the public methods implemented by go's testing.T. It allows assertion
-// libraries to be used with godog, provided they depend only on this subset of methods.
 type TestingT interface {
 	// Name returns the name of the current pickle under test
 	Name() string
@@ -54,31 +55,17 @@ type TestingT interface {
 // Logf will log test output. If called in the context of a test and testing.T has been registered,
 // this will log using the step's testing.T, else it will simply log to stdout.
 func Logf(ctx context.Context, format string, args ...interface{}) {
-	if t := getTestingT(ctx); t != nil {
-		t.Logf(format, args...)
-		return
-	}
-	fmt.Printf(format+"\n", args...)
+	_ = "STUB: not implemented"
+	return
 }
 
 // Log will log test output. If called in the context of a test and testing.T has been registered,
 // this will log using the step's testing.T, else it will simply log to stdout.
-func Log(ctx context.Context, args ...interface{}) {
-	if t := getTestingT(ctx); t != nil {
-		t.Log(args...)
-		return
-	}
-	fmt.Println(args...)
-}
+func Log(ctx context.Context, args ...interface{}) { _ = "STUB: not implemented"; return }
 
 // LoggedMessages returns an array of any logged messages that have been recorded during the test
 // through calls to godog.Log / godog.Logf or via operations against godog.T(ctx)
-func LoggedMessages(ctx context.Context) []string {
-	if t := getTestingT(ctx); t != nil {
-		return t.logMessages
-	}
-	return nil
-}
+func LoggedMessages(ctx context.Context) []string { _ = "STUB: not implemented"; return nil }
 
 // errStopNow should be returned inside a panic within the test to immediately halt execution of that
 // test
@@ -99,109 +86,44 @@ var (
 	_ TestingT = (*testing.T)(nil)
 )
 
-func (dt *testingT) Name() string {
-	if dt.t != nil {
-		return dt.t.Name()
-	}
-	return dt.name
-}
+func (dt *testingT) Name() string { _ = "STUB: not implemented"; return "" }
 
-func (dt *testingT) Log(args ...interface{}) {
-	dt.logMessages = append(dt.logMessages, fmt.Sprint(args...))
-	if dt.t != nil {
-		dt.t.Log(args...)
-		return
-	}
-	fmt.Println(args...)
-}
+func (dt *testingT) Log(args ...interface{}) { _ = "STUB: not implemented"; return }
 
-func (dt *testingT) Logf(format string, args ...interface{}) {
-	dt.logMessages = append(dt.logMessages, fmt.Sprintf(format, args...))
-	if dt.t != nil {
-		dt.t.Logf(format, args...)
-		return
-	}
-	fmt.Printf(format+"\n", args...)
-}
+func (dt *testingT) Logf(format string, args ...interface{}) { _ = "STUB: not implemented"; return }
 
-func (dt *testingT) Error(args ...interface{}) {
-	dt.Log(args...)
-	dt.failMessages = append(dt.failMessages, fmt.Sprintln(args...))
-	dt.Fail()
-}
+func (dt *testingT) Error(args ...interface{}) { _ = "STUB: not implemented"; return }
 
-func (dt *testingT) Errorf(format string, args ...interface{}) {
-	dt.Logf(format, args...)
-	dt.failMessages = append(dt.failMessages, fmt.Sprintf(format, args...))
-	dt.Fail()
-}
+func (dt *testingT) Errorf(format string, args ...interface{}) { _ = "STUB: not implemented"; return }
 
-func (dt *testingT) Fail() {
-	dt.failed = true
-}
+func (dt *testingT) Fail() { _ = "STUB: not implemented"; return }
 
-func (dt *testingT) FailNow() {
-	dt.Fail()
-	panic(errStopNow)
-}
+func (dt *testingT) FailNow() { _ = "STUB: not implemented"; return }
 
-func (dt *testingT) Fatal(args ...interface{}) {
-	dt.Log(args...)
-	dt.FailNow()
-}
+func (dt *testingT) Fatal(args ...interface{}) { _ = "STUB: not implemented"; return }
 
-func (dt *testingT) Fatalf(format string, args ...interface{}) {
-	dt.Logf(format, args...)
-	dt.FailNow()
-}
+func (dt *testingT) Fatalf(format string, args ...interface{}) { _ = "STUB: not implemented"; return }
 
-func (dt *testingT) Skip(args ...interface{}) {
-	dt.Log(args...)
-	dt.skipped = true
-}
+func (dt *testingT) Skip(args ...interface{}) { _ = "STUB: not implemented"; return }
 
-func (dt *testingT) Skipf(format string, args ...interface{}) {
-	dt.Logf(format, args...)
-	dt.skipped = true
-}
+func (dt *testingT) Skipf(format string, args ...interface{}) { _ = "STUB: not implemented"; return }
 
-func (dt *testingT) SkipNow() {
-	dt.skipped = true
-	panic(errStopNow)
-}
+func (dt *testingT) SkipNow() { _ = "STUB: not implemented"; return }
 
 func (dt *testingT) Skipped() bool {
-	return dt.skipped
+	_ = "STUB: not implemented"
+
+	// isFailed will return an error representing the calls to Fail made during this test
+	return false
 }
 
-// isFailed will return an error representing the calls to Fail made during this test
-func (dt *testingT) isFailed() error {
-	if dt.skipped {
-		return ErrSkip
-	}
-	if !dt.failed {
-		return nil
-	}
-	switch len(dt.failMessages) {
-	case 0:
-		return errors.New("fail called on TestingT")
-	case 1:
-		return errors.New(dt.failMessages[0])
-	default:
-		return fmt.Errorf("checks failed:\n* %s", strings.Join(dt.failMessages, "\n* "))
-	}
-}
+func (dt *testingT) isFailed() error { _ = "STUB: not implemented"; return nil }
 
 type testingTCtxVal struct{}
 
 func setContextTestingT(ctx context.Context, dt *testingT) context.Context {
-	return context.WithValue(ctx, testingTCtxVal{}, dt)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
-func getTestingT(ctx context.Context) *testingT {
-	dt, ok := ctx.Value(testingTCtxVal{}).(*testingT)
-	if !ok {
-		return nil
-	}
-	return dt
-}
+func getTestingT(ctx context.Context) *testingT { _ = "STUB: not implemented"; return nil }

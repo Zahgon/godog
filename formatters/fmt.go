@@ -18,40 +18,18 @@ var registeredFormatters []*registeredFormatter
 // FindFmt searches available formatters registered
 // and returns FormaterFunc matched by given
 // format name or nil otherwise
-func FindFmt(name string) FormatterFunc {
-	for _, el := range registeredFormatters {
-		if el.name == name {
-			return el.fmt
-		}
-	}
-
-	return nil
-}
+func FindFmt(name string) FormatterFunc { _ = "STUB: not implemented"; return *new(FormatterFunc) }
 
 // Format registers a feature suite output
 // formatter by given name, description and
 // FormatterFunc constructor function, to initialize
 // formatter with the output recorder.
-func Format(name, description string, f FormatterFunc) {
-	registeredFormatters = append(registeredFormatters, &registeredFormatter{
-		name:        name,
-		fmt:         f,
-		description: description,
-	})
-}
+func Format(name, description string, f FormatterFunc) { _ = "STUB: not implemented"; return }
 
 // AvailableFormatters gives a map of all
 // formatters registered with their name as key
 // and description as value
-func AvailableFormatters() map[string]string {
-	fmts := make(map[string]string, len(registeredFormatters))
-
-	for _, f := range registeredFormatters {
-		fmts[f.name] = f.description
-	}
-
-	return fmts
-}
+func AvailableFormatters() map[string]string { _ = "STUB: not implemented"; return nil }
 
 // Formatter is an interface for feature runner
 // output summary presentation.

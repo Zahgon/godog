@@ -1,17 +1,11 @@
 package utils
 
 import (
-	"strings"
 	"time"
 )
 
 // S repeats a space n times
-func S(n int) string {
-	if n < 0 {
-		n = 1
-	}
-	return strings.Repeat(" ", n)
-}
+func S(n int) string { _ = "STUB: not implemented"; return "" }
 
 // TimeNowFunc is a utility function to simply testing
 // by allowing TimeNowFunc to be defined to zero time

@@ -15,137 +15,27 @@ type Feature struct {
 
 // FindRule returns the rule to which the given scenario belongs
 func (f Feature) FindRule(astScenarioID string) *messages.Rule {
-	for _, child := range f.GherkinDocument.Feature.Children {
-		if ru := child.Rule; ru != nil {
-			if rc := child.Rule; rc != nil {
-				for _, rcc := range rc.Children {
-					if sc := rcc.Scenario; sc != nil && sc.Id == astScenarioID {
-						return ru
-					}
-				}
-			}
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // FindScenario returns the scenario in the feature or in a rule in the feature
 func (f Feature) FindScenario(astScenarioID string) *messages.Scenario {
-	for _, child := range f.GherkinDocument.Feature.Children {
-		if sc := child.Scenario; sc != nil && sc.Id == astScenarioID {
-			return sc
-		}
-		if rc := child.Rule; rc != nil {
-			for _, rcc := range rc.Children {
-				if sc := rcc.Scenario; sc != nil && sc.Id == astScenarioID {
-					return sc
-				}
-			}
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // FindBackground ...
 func (f Feature) FindBackground(astScenarioID string) *messages.Background {
-	var bg *messages.Background
-
-	for _, child := range f.GherkinDocument.Feature.Children {
-		if tmp := child.Background; tmp != nil {
-			bg = tmp
-		}
-
-		if sc := child.Scenario; sc != nil && sc.Id == astScenarioID {
-			return bg
-		}
-
-		if ru := child.Rule; ru != nil {
-			for _, rc := range ru.Children {
-				if tmp := rc.Background; tmp != nil {
-					bg = tmp
-				}
-
-				if sc := rc.Scenario; sc != nil && sc.Id == astScenarioID {
-					return bg
-				}
-			}
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // FindExample ...
 func (f Feature) FindExample(exampleAstID string) (*messages.Examples, *messages.TableRow) {
-	for _, child := range f.GherkinDocument.Feature.Children {
-		if sc := child.Scenario; sc != nil {
-			for _, example := range sc.Examples {
-				for _, row := range example.TableBody {
-					if row.Id == exampleAstID {
-						return example, row
-					}
-				}
-			}
-		}
-		if ru := child.Rule; ru != nil {
-			for _, rc := range ru.Children {
-				if sc := rc.Scenario; sc != nil {
-					for _, example := range sc.Examples {
-						for _, row := range example.TableBody {
-							if row.Id == exampleAstID {
-								return example, row
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return nil, nil
 }
 
 // FindStep ...
-func (f Feature) FindStep(astStepID string) *messages.Step {
-	for _, child := range f.GherkinDocument.Feature.Children {
-
-		if ru := child.Rule; ru != nil {
-			for _, ch := range ru.Children {
-				if sc := ch.Scenario; sc != nil {
-					for _, step := range sc.Steps {
-						if step.Id == astStepID {
-							return step
-						}
-					}
-				}
-
-				if bg := ch.Background; bg != nil {
-					for _, step := range bg.Steps {
-						if step.Id == astStepID {
-							return step
-						}
-					}
-				}
-			}
-		}
-
-		if sc := child.Scenario; sc != nil {
-			for _, step := range sc.Steps {
-				if step.Id == astStepID {
-					return step
-				}
-			}
-		}
-
-		if bg := child.Background; bg != nil {
-			for _, step := range bg.Steps {
-				if step.Id == astStepID {
-					return step
-				}
-			}
-		}
-	}
-
-	return nil
-}
+func (f Feature) FindStep(astStepID string) *messages.Step { _ = "STUB: not implemented"; return nil }

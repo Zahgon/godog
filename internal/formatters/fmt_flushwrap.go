@@ -10,11 +10,8 @@ import (
 // WrapOnFlush wrap a `formatters.Formatter` in a `formatters.FlushFormatter`, which only
 // executes when `Flush` is called
 func WrapOnFlush(fmt formatters.Formatter) formatters.FlushFormatter {
-	return &onFlushFormatter{
-		fmt: fmt,
-		fns: make([]func(), 0),
-		mu:  &sync.Mutex{},
-	}
+	_ = "STUB: not implemented"
+	return *new(formatters.FlushFormatter)
 }
 
 type onFlushFormatter struct {
@@ -23,86 +20,60 @@ type onFlushFormatter struct {
 	mu  *sync.Mutex
 }
 
-func (o *onFlushFormatter) Pickle(pickle *messages.Pickle) {
-	o.fns = append(o.fns, func() {
-		o.fmt.Pickle(pickle)
-	})
-}
+func (o *onFlushFormatter) Pickle(pickle *messages.Pickle) { _ = "STUB: not implemented"; return }
 
 func (o *onFlushFormatter) Passed(pickle *messages.Pickle, step *messages.PickleStep, definition *formatters.StepDefinition) {
-	o.fns = append(o.fns, func() {
-		o.fmt.Passed(pickle, step, definition)
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // Ambiguous implements formatters.Formatter.
 func (o *onFlushFormatter) Ambiguous(pickle *messages.Pickle, step *messages.PickleStep, definition *formatters.StepDefinition, err error) {
-	o.fns = append(o.fns, func() {
-		o.fmt.Ambiguous(pickle, step, definition, err)
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // Defined implements formatters.Formatter.
 func (o *onFlushFormatter) Defined(pickle *messages.Pickle, step *messages.PickleStep, definition *formatters.StepDefinition) {
-	o.fns = append(o.fns, func() {
-		o.fmt.Defined(pickle, step, definition)
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // Failed implements formatters.Formatter.
 func (o *onFlushFormatter) Failed(pickle *messages.Pickle, step *messages.PickleStep, definition *formatters.StepDefinition, err error) {
-	o.fns = append(o.fns, func() {
-		o.fmt.Failed(pickle, step, definition, err)
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // Feature implements formatters.Formatter.
 func (o *onFlushFormatter) Feature(pickle *messages.GherkinDocument, p string, c []byte) {
-	o.fns = append(o.fns, func() {
-		o.fmt.Feature(pickle, p, c)
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // Pending implements formatters.Formatter.
 func (o *onFlushFormatter) Pending(pickle *messages.Pickle, step *messages.PickleStep, definition *formatters.StepDefinition) {
-	o.fns = append(o.fns, func() {
-		o.fmt.Pending(pickle, step, definition)
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // Skipped implements formatters.Formatter.
 func (o *onFlushFormatter) Skipped(pickle *messages.Pickle, step *messages.PickleStep, definition *formatters.StepDefinition) {
-	o.fns = append(o.fns, func() {
-		o.fmt.Skipped(pickle, step, definition)
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // Summary implements formatters.Formatter.
-func (o *onFlushFormatter) Summary() {
-	o.fns = append(o.fns, func() {
-		o.fmt.Summary()
-	})
-}
+func (o *onFlushFormatter) Summary() { _ = "STUB: not implemented"; return }
 
 // TestRunStarted implements formatters.Formatter.
-func (o *onFlushFormatter) TestRunStarted() {
-	o.fns = append(o.fns, func() {
-		o.fmt.TestRunStarted()
-	})
-}
+func (o *onFlushFormatter) TestRunStarted() { _ = "STUB: not implemented"; return }
 
 // Undefined implements formatters.Formatter.
 func (o *onFlushFormatter) Undefined(pickle *messages.Pickle, step *messages.PickleStep, definition *formatters.StepDefinition) {
-	o.fns = append(o.fns, func() {
-		o.fmt.Undefined(pickle, step, definition)
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // Flush the logs.
-func (o *onFlushFormatter) Flush() {
-	o.mu.Lock()
-	defer o.mu.Unlock()
-	for _, fn := range o.fns {
-		fn()
-	}
-}
+func (o *onFlushFormatter) Flush() { _ = "STUB: not implemented"; return }

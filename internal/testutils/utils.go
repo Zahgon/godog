@@ -1,12 +1,7 @@
 package testutils
 
 import (
-	"strings"
 	"testing"
-
-	gherkin "github.com/cucumber/gherkin/go/v26"
-	messages "github.com/cucumber/messages/go/v21"
-	"github.com/stretchr/testify/require"
 
 	"github.com/cucumber/godog/internal/models"
 )
@@ -18,25 +13,8 @@ import (
 //   - one normal scenario with three steps
 //   - one outline scenario with one example and three steps
 func BuildTestFeature(t *testing.T) models.Feature {
-	newIDFunc := (&messages.Incrementing{}).NewId
-
-	gherkinDocument, err := gherkin.ParseGherkinDocument(strings.NewReader(featureContent), newIDFunc)
-	require.NoError(t, err)
-
-	path := t.Name()
-	gherkinDocument.Uri = path
-	pickles := gherkin.Pickles(*gherkinDocument, path, newIDFunc)
-
-	ft := models.Feature{GherkinDocument: gherkinDocument, Pickles: pickles, Content: []byte(featureContent)}
-	require.Len(t, ft.Pickles, 2)
-
-	require.Len(t, ft.Pickles[0].AstNodeIds, 1)
-	require.Len(t, ft.Pickles[0].Steps, 3)
-
-	require.Len(t, ft.Pickles[1].AstNodeIds, 2)
-	require.Len(t, ft.Pickles[1].Steps, 3)
-
-	return ft
+	_ = "STUB: not implemented"
+	return *new(models.Feature)
 }
 
 const featureContent = `Feature: eat godogs
@@ -66,25 +44,8 @@ Scenario Outline: Eat <dec> out of <beginning>
 //   - one normal scenario with three steps
 //   - one outline scenario with one example and three steps
 func BuildTestFeatureWithRules(t *testing.T) models.Feature {
-	newIDFunc := (&messages.Incrementing{}).NewId
-
-	gherkinDocument, err := gherkin.ParseGherkinDocument(strings.NewReader(featureWithRuleContent), newIDFunc)
-	require.NoError(t, err)
-
-	path := t.Name()
-	gherkinDocument.Uri = path
-	pickles := gherkin.Pickles(*gherkinDocument, path, newIDFunc)
-
-	ft := models.Feature{GherkinDocument: gherkinDocument, Pickles: pickles, Content: []byte(featureWithRuleContent)}
-	require.Len(t, ft.Pickles, 2)
-
-	require.Len(t, ft.Pickles[0].AstNodeIds, 1)
-	require.Len(t, ft.Pickles[0].Steps, 3)
-
-	require.Len(t, ft.Pickles[1].AstNodeIds, 2)
-	require.Len(t, ft.Pickles[1].Steps, 3)
-
-	return ft
+	_ = "STUB: not implemented"
+	return *new(models.Feature)
 }
 
 const featureWithRuleContent = `Feature: eat godogs

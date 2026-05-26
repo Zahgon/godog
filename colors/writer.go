@@ -24,18 +24,11 @@ const (
 // In the console of Windows, which change the foreground and background
 // colors of the text by the escape sequence.
 // In the console of other systems, which writes to w all text.
-func Colored(w io.Writer) io.Writer {
-	return createModeAnsiColorWriter(w, discardNonColorEscSeq)
-}
+func Colored(w io.Writer) io.Writer { _ = "STUB: not implemented"; return *new(io.Writer) }
 
 // NewModeAnsiColorWriter create and initializes a new ansiColorWriter
 // by specifying the outputMode.
 func createModeAnsiColorWriter(w io.Writer, mode outputMode) io.Writer {
-	if _, ok := w.(*ansiColorWriter); !ok {
-		return &ansiColorWriter{
-			w:    w,
-			mode: mode,
-		}
-	}
-	return w
+	_ = "STUB: not implemented"
+	return *new(io.Writer)
 }

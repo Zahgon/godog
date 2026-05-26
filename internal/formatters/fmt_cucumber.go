@@ -12,12 +12,7 @@ package formatters
 */
 
 import (
-	"encoding/base64"
-	"encoding/json"
-	"fmt"
 	"io"
-	"sort"
-	"strings"
 
 	"github.com/cucumber/godog/formatters"
 	"github.com/cucumber/godog/internal/models"
@@ -30,7 +25,8 @@ func init() {
 
 // CucumberFormatterFunc implements the FormatterFunc for the cucumber formatter
 func CucumberFormatterFunc(suite string, out io.Writer) formatters.Formatter {
-	return &Cuke{Base: NewBase(suite, out)}
+	_ = "STUB: not implemented"
+	return *new(formatters.Formatter)
 }
 
 // Cuke ...
@@ -39,80 +35,16 @@ type Cuke struct {
 }
 
 // Summary renders test result as Cucumber JSON.
-func (f *Cuke) Summary() {
-	features := f.Storage.MustGetFeatures()
-
-	res := f.buildCukeFeatures(features)
-
-	dat, err := json.MarshalIndent(res, "", "    ")
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Fprintf(f.out, "%s\n", string(dat))
-}
+func (f *Cuke) Summary() { _ = "STUB: not implemented"; return }
 
 func (f *Cuke) buildCukeFeatures(features []*models.Feature) (res []CukeFeatureJSON) {
-	sort.Sort(sortFeaturesByName(features))
-
-	res = make([]CukeFeatureJSON, len(features))
-
-	for idx, feat := range features {
-		cukeFeature := buildCukeFeature(feat)
-
-		pickles := f.Storage.MustGetPickles(feat.Uri)
-		sort.Sort(sortPicklesByID(pickles))
-
-		cukeFeature.Elements = f.buildCukeElements(pickles)
-
-		for jdx, elem := range cukeFeature.Elements {
-			elem.ID = cukeFeature.ID + ";" + makeCukeID(elem.Name) + elem.ID
-			elem.Tags = append(cukeFeature.Tags, elem.Tags...)
-			cukeFeature.Elements[jdx] = elem
-		}
-
-		res[idx] = cukeFeature
-	}
-
-	return res
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (f *Cuke) buildCukeElements(pickles []*messages.Pickle) (res []cukeElement) {
-	res = make([]cukeElement, len(pickles))
-
-	for idx, pickle := range pickles {
-		pickleResult := f.Storage.MustGetPickleResult(pickle.Id)
-		pickleStepResults := f.Storage.MustGetPickleStepResultsByPickleID(pickle.Id)
-
-		cukeElement := f.buildCukeElement(pickle)
-
-		stepStartedAt := pickleResult.StartedAt
-
-		cukeElement.Steps = make([]cukeStep, len(pickleStepResults))
-		sort.Sort(sortPickleStepResultsByPickleStepID(pickleStepResults))
-
-		for jdx, stepResult := range pickleStepResults {
-			cukeStep := f.buildCukeStep(pickle, stepResult)
-
-			stepResultFinishedAt := stepResult.FinishedAt
-			d := int(stepResultFinishedAt.Sub(stepStartedAt).Nanoseconds())
-			stepStartedAt = stepResultFinishedAt
-
-			cukeStep.Result.Duration = &d
-			if stepResult.Status == undefined ||
-				stepResult.Status == pending ||
-				stepResult.Status == skipped ||
-				stepResult.Status == ambiguous {
-				cukeStep.Result.Duration = nil
-			}
-
-			cukeElement.Steps[jdx] = cukeStep
-		}
-
-		res[idx] = cukeElement
-	}
-
-	return res
+	_ = "STUB: not implemented"
+	return nil
 }
 
 type cukeComment struct {
@@ -187,140 +119,18 @@ type CukeFeatureJSON struct {
 }
 
 func buildCukeFeature(feat *models.Feature) CukeFeatureJSON {
-	cukeFeature := CukeFeatureJSON{
-		URI:         feat.Uri,
-		ID:          makeCukeID(feat.Feature.Name),
-		Keyword:     feat.Feature.Keyword,
-		Name:        feat.Feature.Name,
-		Description: feat.Feature.Description,
-		Line:        int(feat.Feature.Location.Line),
-		Comments:    make([]cukeComment, len(feat.Comments)),
-		Tags:        make([]cukeTag, len(feat.Feature.Tags)),
-	}
-
-	for idx, element := range feat.Feature.Tags {
-		cukeFeature.Tags[idx].Line = int(element.Location.Line)
-		cukeFeature.Tags[idx].Name = element.Name
-	}
-
-	for idx, comment := range feat.Comments {
-		cukeFeature.Comments[idx].Value = strings.TrimSpace(comment.Text)
-		cukeFeature.Comments[idx].Line = int(comment.Location.Line)
-	}
-
-	return cukeFeature
+	_ = "STUB: not implemented"
+	return *new(CukeFeatureJSON)
 }
 
 func (f *Cuke) buildCukeElement(pickle *messages.Pickle) (cukeElement cukeElement) {
-	feature := f.Storage.MustGetFeature(pickle.Uri)
-	scenario := feature.FindScenario(pickle.AstNodeIds[0])
-
-	cukeElement.Name = pickle.Name
-	cukeElement.Line = int(scenario.Location.Line)
-	cukeElement.Description = scenario.Description
-	cukeElement.Keyword = scenario.Keyword
-	cukeElement.Type = "scenario"
-
-	cukeElement.Tags = make([]cukeTag, len(scenario.Tags))
-	for idx, element := range scenario.Tags {
-		cukeElement.Tags[idx].Line = int(element.Location.Line)
-		cukeElement.Tags[idx].Name = element.Name
-	}
-
-	if len(pickle.AstNodeIds) == 1 {
-		return
-	}
-
-	example, _ := feature.FindExample(pickle.AstNodeIds[1])
-
-	for _, tag := range example.Tags {
-		tag := cukeTag{Line: int(tag.Location.Line), Name: tag.Name}
-		cukeElement.Tags = append(cukeElement.Tags, tag)
-	}
-
-	examples := scenario.Examples
-	if len(examples) > 0 {
-		rowID := pickle.AstNodeIds[1]
-
-		for _, example := range examples {
-			for idx, row := range example.TableBody {
-				if rowID == row.Id {
-					cukeElement.ID += fmt.Sprintf(";%s;%d", makeCukeID(example.Name), idx+2)
-					cukeElement.Line = int(row.Location.Line)
-				}
-			}
-		}
-	}
-
-	return cukeElement
+	_ = "STUB: not implemented"
+	return *new(cukeElement)
 }
 
 func (f *Cuke) buildCukeStep(pickle *messages.Pickle, stepResult models.PickleStepResult) (cukeStep cukeStep) {
-	feature := f.Storage.MustGetFeature(pickle.Uri)
-	pickleStep := f.Storage.MustGetPickleStep(stepResult.PickleStepID)
-	step := feature.FindStep(pickleStep.AstNodeIds[0])
-
-	line := step.Location.Line
-
-	cukeStep.Name = pickleStep.Text
-	cukeStep.Line = int(line)
-	cukeStep.Keyword = step.Keyword
-
-	arg := pickleStep.Argument
-
-	if arg != nil {
-		if arg.DocString != nil && step.DocString != nil {
-			cukeStep.Docstring = &cukeDocstring{}
-			cukeStep.Docstring.ContentType = strings.TrimSpace(arg.DocString.MediaType)
-			if step.Location != nil {
-				cukeStep.Docstring.Line = int(step.DocString.Location.Line)
-			}
-			cukeStep.Docstring.Value = arg.DocString.Content
-		}
-
-		if arg.DataTable != nil {
-			cukeStep.DataTable = make([]*cukeDataTableRow, len(arg.DataTable.Rows))
-			for i, row := range arg.DataTable.Rows {
-				cells := make([]string, len(row.Cells))
-				for j, cell := range row.Cells {
-					cells[j] = cell.Value
-				}
-				cukeStep.DataTable[i] = &cukeDataTableRow{Cells: cells}
-			}
-		}
-	}
-
-	if stepResult.Def != nil {
-		cukeStep.Match.Location = strings.Split(DefinitionID(stepResult.Def), " ")[0]
-	}
-
-	cukeStep.Result.Status = stepResult.Status.String()
-	if stepResult.Err != nil {
-		cukeStep.Result.Error = stepResult.Err.Error()
-	}
-
-	if stepResult.Status == undefined || stepResult.Status == pending || stepResult.Status == ambiguous {
-		cukeStep.Match.Location = fmt.Sprintf("%s:%d", pickle.Uri, step.Location.Line)
-	}
-
-	if stepResult.Attachments != nil {
-		attachments := []cukeEmbedding{}
-
-		for _, a := range stepResult.Attachments {
-			attachments = append(attachments, cukeEmbedding{
-				Name:     a.Name,
-				Data:     base64.StdEncoding.EncodeToString(a.Data),
-				MimeType: a.MimeType,
-			})
-		}
-
-		if len(attachments) > 0 {
-			cukeStep.Embeddings = attachments
-		}
-	}
-	return cukeStep
+	_ = "STUB: not implemented"
+	return *new(cukeStep)
 }
 
-func makeCukeID(name string) string {
-	return strings.Replace(strings.ToLower(name), " ", "-", -1)
-}
+func makeCukeID(name string) string { _ = "STUB: not implemented"; return "" }
